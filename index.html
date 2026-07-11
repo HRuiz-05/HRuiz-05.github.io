@@ -307,6 +307,53 @@
   .project.empty .plus{ font-family:var(--display); font-size:2.4rem; color:var(--accent); line-height:1; }
   .project.empty p{ color:var(--muted); font-family:var(--mono); font-size:13px; margin-top:10px; }
 
+  .project-clickable{ cursor:pointer; }
+  .case-cta{ display:inline-block; margin-top:16px; font-family:var(--mono); font-size:12.5px; font-weight:500; color:var(--accent); }
+  .project-clickable:hover .case-cta{ text-decoration:underline; }
+
+  .modal-overlay{
+    position:fixed; inset:0; z-index:100;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:24px 16px; overflow-y:auto;
+    background:rgba(10,11,16,.55); backdrop-filter:blur(4px);
+    opacity:0; visibility:hidden; transition:opacity .25s ease, visibility .25s ease;
+  }
+  .modal-overlay.open{ opacity:1; visibility:visible; }
+  .modal{
+    background:var(--surface); color:var(--ink);
+    width:100%; max-width:680px; margin:auto; border-radius:22px;
+    border:1px solid var(--line); box-shadow:var(--shadow); overflow:hidden;
+    transform:translateY(16px) scale(.98); transition:transform .25s ease;
+  }
+  .modal-overlay.open .modal{ transform:none; }
+  .modal-head{ position:relative; padding:32px 30px 22px; border-bottom:1px solid var(--line); }
+  .modal-head h3{ font-family:var(--display); font-weight:600; font-size:clamp(1.3rem,4vw,1.6rem); letter-spacing:-.02em; margin:12px 0 16px; }
+  .modal-head .stack{ display:flex; flex-wrap:wrap; gap:7px; }
+  .modal-head .stack span{ font-family:var(--mono); font-size:11px; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:4px 9px; }
+  .modal-close{
+    position:absolute; top:22px; right:22px; width:38px; height:38px; border-radius:50%;
+    border:1px solid var(--line); background:var(--bg); color:var(--ink);
+    font-size:20px; line-height:1; cursor:pointer; display:grid; place-items:center;
+    transition:border-color .2s ease, transform .3s ease;
+  }
+  .modal-close:hover{ border-color:var(--accent); transform:rotate(90deg); }
+  .modal-body{ padding:26px 30px 34px; }
+  .confidential-note{
+    display:flex; gap:11px; align-items:flex-start; margin-bottom:26px;
+    background:rgba(122,92,255,.10); border:1px solid rgba(122,92,255,.28);
+    border-radius:12px; padding:14px 16px; font-size:.92rem; color:var(--ink);
+  }
+  .confidential-note svg{ flex-shrink:0; width:18px; height:18px; fill:none; stroke:var(--violet); stroke-width:2; margin-top:1px; }
+  .modal-body section{ margin-bottom:24px; }
+  .modal-body section:last-child{ margin-bottom:0; }
+  .modal-body h4{ font-family:var(--display); font-weight:600; font-size:1.05rem; margin-bottom:8px; }
+  .modal-body p{ color:var(--muted); font-size:.98rem; }
+  .flow{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:6px 0 4px; }
+  .flow-step{ background:var(--bg); border:1px solid var(--line); border-radius:10px; padding:9px 13px; }
+  .flow-step b{ font-family:var(--display); font-weight:600; font-size:.9rem; display:block; }
+  .flow-step small{ font-family:var(--mono); font-size:10.5px; color:var(--muted); }
+  .flow-arrow{ color:var(--accent); font-weight:700; }
+
   footer{ position:relative; z-index:2; background:var(--footer-bg); color:var(--footer-ink); padding:90px 0 40px; }
   footer h2{ font-family:var(--display); font-weight:600; font-size:clamp(2rem,5vw,3.4rem); letter-spacing:-.03em; line-height:1.05; }
   footer .sub{ color:#9aa1b2; margin-top:18px; max-width:520px; }
@@ -371,7 +418,7 @@
   <section class="hero">
     <div class="wrap">
 
-      <div id="photo"><img id="photo-img" src="higor-ruiz.jpg" alt="Higor Ruiz"></div>
+      <div id="photo"><img id="photo-img" src="higor-ruiz.jpeg" alt="Higor Ruiz"></div>
 
       <span class="eyebrow" data-i18n="hero_eyebrow">São Paulo · TI</span>
       <h1>Higor<br><span class="accent" data-i18n="hero_role">Sistemas & Infra</span></h1>
@@ -503,12 +550,13 @@
         <p data-i18n="proj_sub">Exemplos reais — substitua ou adicione conforme quiser.</p>
       </div>
       <div class="projects">
-        <div class="project">
+        <div class="project project-clickable" role="button" tabindex="0" onclick="openCase('case-metabase')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCase('case-metabase');}">
           <div class="cover"><span class="tag">Data</span></div>
           <div class="body">
             <h4 data-i18n="proj2_t">Pipeline ETL + Dashboards</h4>
             <p data-i18n="proj2_d">Extração via API/SQL, tratamento em Python e visualização em Metabase — de dado bruto a decisão.</p>
             <div class="stack"><span>Python</span><span>SQL</span><span>Metabase</span></div>
+            <span class="case-cta" data-i18n="proj2_cta">Ver case →</span>
           </div>
         </div>
 
@@ -522,6 +570,48 @@
     </div>
   </section>
 
+  <div class="modal-overlay" id="case-metabase" role="dialog" aria-modal="true" aria-labelledby="case-metabase-title" aria-hidden="true" onclick="if(event.target===this)closeCase();">
+    <div class="modal">
+      <div class="modal-head">
+        <button class="modal-close" onclick="closeCase()" aria-label="Fechar">&times;</button>
+        <span class="eyebrow" data-i18n="case_eyebrow">Case · Dados</span>
+        <h3 id="case-metabase-title" data-i18n="case_title">Pipeline ETL + Dashboards (Metabase)</h3>
+        <div class="stack"><span>Python</span><span>pandas</span><span>SQL</span><span>Metabase</span></div>
+      </div>
+      <div class="modal-body">
+        <div class="confidential-note">
+          <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span data-i18n="case_note">Por se tratar de dados internos e sigilosos da empresa, não exibo números reais nem capturas dos dashboards. O foco aqui é a arquitetura e o processo.</span>
+        </div>
+        <section>
+          <h4 data-i18n="case_ctx_t">O contexto</h4>
+          <p data-i18n="case_ctx_d">Os dados operacionais estavam espalhados entre o sistema de PDV, consultas manuais e planilhas. Cada relatório exigia extração e consolidação na mão — trabalhoso e sujeito a erro.</p>
+        </section>
+        <section>
+          <h4 data-i18n="case_cha_t">O desafio</h4>
+          <p data-i18n="case_cha_d">Criar um fluxo automático e confiável que transformasse esses dados brutos em informação pronta para decisão, sem depender de trabalho manual recorrente.</p>
+        </section>
+        <section>
+          <h4 data-i18n="case_how_t">Como foi feito</h4>
+          <div class="flow">
+            <div class="flow-step"><b data-i18n="flow1_t">Extração</b><small>API / SQL</small></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step"><b data-i18n="flow2_t">Tratamento</b><small>Python / pandas</small></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step"><b data-i18n="flow3_t">Carga</b><small>SQL</small></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step"><b data-i18n="flow4_t">Visualização</b><small>Metabase</small></div>
+          </div>
+          <p data-i18n="case_how_d">Montei um pipeline de ponta a ponta: extração da fonte via API/SQL, tratamento e padronização em Python com pandas, carga em banco SQL estruturado e visualização em painéis de Metabase. A rotina roda de forma agendada, mantendo os dados sempre atualizados.</p>
+        </section>
+        <section>
+          <h4 data-i18n="case_res_t">O resultado</h4>
+          <p data-i18n="case_res_d">Relatórios que antes eram feitos manualmente passaram a ser gerados de forma automática e consolidada, dando à equipe uma visão confiável e em tempo hábil para tomar decisões.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+
   <footer id="contact">
     <div class="wrap reveal">
       <span class="eyebrow" style="color:var(--mint)" data-i18n="contact_eyebrow">Contato</span>
@@ -532,7 +622,7 @@
         <a class="primary" href="mailto:higorruizg@icloud.com" data-i18n="cta_email">✉ Enviar e-mail</a>
         <a href="https://www.linkedin.com/in/higor-ruiz" target="_blank" rel="noopener">LinkedIn</a>
         <a href="https://github.com/HRuiz-05" target="_blank" rel="noopener">GitHub</a>
-        <a href="CV_Higor_Ruiz.pdf" download="CV_Higor_Ruiz.pdf" data-i18n="cta_cv">↓ Baixar CV</a>
+        <a href="CV%20Higor%20Ruiz.pdf" download="CV_Higor_Ruiz.pdf" data-i18n="cta_cv">↓ Baixar CV</a>
       </div>
 
       <div class="foot-bottom">
@@ -569,7 +659,15 @@
       cert_view:"Ver certificado ↗",
       proj_eyebrow:"Projetos", proj_title:"Alguns trabalhos", proj_sub:"Exemplos reais — substitua ou adicione conforme quiser.",
       proj2_t:"Pipeline ETL + Dashboards", proj2_d:"Extração via API/SQL, tratamento em Python e visualização em Metabase — de dado bruto a decisão.",
+      proj2_cta:"Ver case →",
       proj_next:"Seu próximo projeto",
+      case_eyebrow:"Case · Dados", case_title:"Pipeline ETL + Dashboards (Metabase)",
+      case_note:"Por se tratar de dados internos e sigilosos da empresa, não exibo números reais nem capturas dos dashboards. O foco aqui é a arquitetura e o processo.",
+      case_ctx_t:"O contexto", case_ctx_d:"Os dados operacionais estavam espalhados entre o sistema de PDV, consultas manuais e planilhas. Cada relatório exigia extração e consolidação na mão — trabalhoso e sujeito a erro.",
+      case_cha_t:"O desafio", case_cha_d:"Criar um fluxo automático e confiável que transformasse esses dados brutos em informação pronta para decisão, sem depender de trabalho manual recorrente.",
+      case_how_t:"Como foi feito", case_how_d:"Montei um pipeline de ponta a ponta: extração da fonte via API/SQL, tratamento e padronização em Python com pandas, carga em banco SQL estruturado e visualização em painéis de Metabase. A rotina roda de forma agendada, mantendo os dados sempre atualizados.",
+      flow1_t:"Extração", flow2_t:"Tratamento", flow3_t:"Carga", flow4_t:"Visualização",
+      case_res_t:"O resultado", case_res_d:"Relatórios que antes eram feitos manualmente passaram a ser gerados de forma automática e consolidada, dando à equipe uma visão confiável e em tempo hábil para tomar decisões.",
       contact_eyebrow:"Contato", contact_title:"Vamos conversar", contact_sub:"Aberto a oportunidades em SAP Basis, infraestrutura e automação de dados.",
       cta_email:"✉ Enviar e-mail", cta_cv:"↓ Baixar CV", foot_made:"Feito à mão · HTML, CSS & JS"
     },
@@ -598,7 +696,15 @@
       cert_view:"View certificate ↗",
       proj_eyebrow:"Projects", proj_title:"Selected work", proj_sub:"Real examples — replace or add as you like.",
       proj2_t:"ETL Pipeline + Dashboards", proj2_d:"Extraction via API/SQL, processing in Python, and visualization in Metabase — from raw data to decision.",
+      proj2_cta:"View case →",
       proj_next:"Your next project",
+      case_eyebrow:"Case study · Data", case_title:"ETL Pipeline + Dashboards (Metabase)",
+      case_note:"As this involves internal, confidential company data, I don't show real figures or dashboard screenshots. The focus here is the architecture and the process.",
+      case_ctx_t:"The context", case_ctx_d:"Operational data was scattered across the POS system, manual queries, and spreadsheets. Every report required extracting and consolidating by hand — slow and error-prone.",
+      case_cha_t:"The challenge", case_cha_d:"Build an automatic, reliable flow that turned this raw data into decision-ready information, without recurring manual work.",
+      case_how_t:"How it was built", case_how_d:"I built an end-to-end pipeline: extraction from the source via API/SQL, cleaning and standardization in Python with pandas, loading into a structured SQL database, and visualization in Metabase dashboards. The routine runs on a schedule, keeping the data always up to date.",
+      flow1_t:"Extraction", flow2_t:"Processing", flow3_t:"Load", flow4_t:"Visualization",
+      case_res_t:"The result", case_res_d:"Reports that used to be produced manually became automatic and consolidated, giving the team a reliable, timely view to make decisions.",
       contact_eyebrow:"Contact", contact_title:"Let's talk", contact_sub:"Open to opportunities in SAP Basis, infrastructure, and data automation.",
       cta_email:"✉ Send email", cta_cv:"↓ Download CV", foot_made:"Handmade · HTML, CSS & JS"
     }
@@ -642,6 +748,22 @@
   // inicia no tema do sistema do visitante
   const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+
+  function openCase(id){
+    const m = document.getElementById(id);
+    if(!m) return;
+    m.classList.add("open");
+    m.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeCase(){
+    document.querySelectorAll(".modal-overlay.open").forEach(m => {
+      m.classList.remove("open");
+      m.setAttribute("aria-hidden", "true");
+    });
+    document.body.style.overflow = "";
+  }
+  document.addEventListener("keydown", e => { if(e.key === "Escape") closeCase(); });
 
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
